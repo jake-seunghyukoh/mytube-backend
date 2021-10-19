@@ -2,6 +2,7 @@ import { Controller, Request, Post, UseGuards, Body } from '@nestjs/common';
 import { LocalAuthGuard } from 'src/auth/local-auth.guard';
 import { AuthService } from 'src/auth/auth.service';
 import { Public } from './decorators';
+import { SignUpDto } from './dto/signup.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -15,7 +16,7 @@ export class AuthController {
 
   @Public()
   @Post('signup')
-  async signUp(@Body() body) {
-    return this.authService.signUp(body.username, body.password);
+  async signUp(@Body() signupDto: SignUpDto) {
+    return this.authService.signUp(signupDto.username, signupDto.password);
   }
 }
