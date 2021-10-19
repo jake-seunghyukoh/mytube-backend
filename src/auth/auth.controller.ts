@@ -1,4 +1,12 @@
-import { Controller, Request, Post, UseGuards, Body } from '@nestjs/common';
+import {
+  Controller,
+  Request,
+  Post,
+  UseGuards,
+  Body,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { LocalAuthGuard } from '../auth/local-auth.guard';
 import { AuthService } from '../auth/auth.service';
 import { Public } from './decorators';
@@ -17,6 +25,15 @@ export class AuthController {
   @Public()
   @Post('signup')
   async signUp(@Body() signupDto: SignUpDto) {
-    return this.authService.signUp(signupDto.username, signupDto.password);
+    const user = await this.authService.signUp(
+      signupDto.username,
+      signupDto.password,
+    );
+
+    if (user === null) {
+      throw new HttpException('User Already Exists', HttpStatus.BAD_REQUEST);
+    }
+
+    return user;
   }
 }

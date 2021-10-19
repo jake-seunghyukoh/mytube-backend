@@ -32,7 +32,7 @@ export class AuthService {
       const { password, ...result } = user;
       return result;
     } else {
-      throw new HttpException('User Already Exists', HttpStatus.BAD_REQUEST);
+      return null;
     }
   }
 }
