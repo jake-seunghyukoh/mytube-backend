@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthService, MockAuthService } from './auth.service';
+import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { LocalStrategy } from './local.strategy';
 import { JwtStrategy } from './jwt.strategy';
@@ -24,7 +24,7 @@ describe('AuthController', () => {
         }),
       ],
       providers: [
-        { provide: AuthService, useValue: MockAuthService },
+        AuthService,
         LocalStrategy,
         JwtStrategy,
         UsersService,
