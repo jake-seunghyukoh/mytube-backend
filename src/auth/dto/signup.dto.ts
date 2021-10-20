@@ -7,3 +7,8 @@ export class SignUpDto {
   @IsString()
   password: string;
 }
+
+export class SignUpResponseDto {
+  id: number;
+  username: string;
+}
