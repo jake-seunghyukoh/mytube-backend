@@ -7,8 +7,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
-import { PrismaService } from '../prisma.service';
+import { UsersModule } from '../users/users.module';
 
 describe('AuthController', () => {
   let authController: AuthController;
@@ -17,20 +16,14 @@ describe('AuthController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
+        UsersModule,
         PassportModule,
         JwtModule.register({
           secret: jwtConstants.secret,
           signOptions: { expiresIn: '24h' },
         }),
       ],
-      providers: [
-        AuthService,
-        LocalStrategy,
-        JwtStrategy,
-        UsersService,
-        PrismaService,
-      ],
-      exports: [AuthService],
+      providers: [AuthService, LocalStrategy, JwtStrategy],
       controllers: [AuthController],
     }).compile();
 
