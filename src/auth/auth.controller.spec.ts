@@ -1,33 +1,41 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthService } from './auth.service';
+import { AuthService, MockAuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { LocalStrategy } from './local.strategy';
 import { JwtStrategy } from './jwt.strategy';
-import { UsersModule } from '../users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { UsersService } from '../users/users.service';
+import { PrismaService } from '../prisma.service';
 
 describe('AuthController', () => {
   let authController: AuthController;
+  let authService: AuthService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
-        UsersModule,
         PassportModule,
         JwtModule.register({
           secret: jwtConstants.secret,
           signOptions: { expiresIn: '24h' },
         }),
       ],
-      providers: [AuthService, LocalStrategy, JwtStrategy],
+      providers: [
+        { provide: AuthService, useValue: MockAuthService },
+        LocalStrategy,
+        JwtStrategy,
+        UsersService,
+        PrismaService,
+      ],
       exports: [AuthService],
       controllers: [AuthController],
     }).compile();
 
-    authController = module.get<AuthController>(AuthController);
+    authController = await module.resolve<AuthController>(AuthController);
+    authService = await module.resolve<AuthService>(AuthService);
   });
 
   it('should be defined', () => {
@@ -41,12 +49,16 @@ describe('AuthController', () => {
         username: 'test',
       };
 
+      jest.spyOn(authService, 'signUp').mockImplementation(async () => result);
+
       expect(
         await authController.signUp({ username: 'test', password: 'password' }),
       ).toBe(result);
     });
 
     it("should throw an HttpException 'User Already Exists' if user already exist", async () => {
+      jest.spyOn(authService, 'signUp').mockImplementation(async () => null);
+
       expect(
         authController.signUp({
           username: 'test',
