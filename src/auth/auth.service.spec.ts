@@ -41,7 +41,7 @@ describe('AuthService', () => {
 
   describe('validateUser', () => {
     it('should validate a user', async () => {
-      const userInfo: User = {
+      const mockedUser: User = {
         id: 1,
         username: 'username',
         password: await hash('password', 10),
@@ -49,28 +49,28 @@ describe('AuthService', () => {
 
       jest
         .spyOn(usersService, 'findOne')
-        .mockImplementation(async () => userInfo);
+        .mockImplementation(async () => mockedUser);
 
-      const result: SignUpResponseDto | null = await authService.validateUser(
+      const userInfo: SignUpResponseDto | null = await authService.validateUser(
         'username',
         'password',
       );
-      expect(result).not.toBeNull();
-      expect(result).toEqual({ id: 1, username: 'username' });
+      expect(userInfo).not.toBeNull();
+      expect(userInfo).toEqual({ id: 1, username: 'username' });
     });
 
     it('should return null with not existing user', async () => {
       jest.spyOn(usersService, 'findOne').mockImplementation(async () => null);
 
-      const result: SignUpResponseDto | null = await authService.validateUser(
+      const userInfo: SignUpResponseDto | null = await authService.validateUser(
         'username',
         'password',
       );
-      expect(result).toBeNull();
+      expect(userInfo).toBeNull();
     });
 
     it('should return null with wrong password', async () => {
-      const userInfo: User = {
+      const mockedUser: User = {
         id: 1,
         username: 'username',
         password: await hash('password', 10),
@@ -78,21 +78,44 @@ describe('AuthService', () => {
 
       jest
         .spyOn(usersService, 'findOne')
-        .mockImplementation(async () => userInfo);
+        .mockImplementation(async () => mockedUser);
 
-      const result: SignUpResponseDto | null = await authService.validateUser(
+      const userInfo: SignUpResponseDto | null = await authService.validateUser(
         'username',
         'wrong_password!!!!',
       );
-      expect(result).toBeNull();
+      expect(userInfo).toBeNull();
     });
   });
 
   describe('login', () => {
-    it('should be defined', () => {});
+    // Skip for now
   });
 
   describe('signUp', () => {
-    it('should be defined', () => {});
+    it('should return a user if the user is created', async () => {
+      const mockedUser: User = {
+        id: 1,
+        username: 'username',
+        password: 'password',
+      };
+      jest
+        .spyOn(usersService, 'createOne')
+        .mockImplementation(async () => mockedUser);
+
+      const userInfo = await authService.signUp('username', 'password');
+
+      expect(userInfo).toEqual({ id: 1, username: 'username' });
+    });
+
+    it('should return null if user already exist', async () => {
+      jest
+        .spyOn(usersService, 'createOne')
+        .mockImplementation(async () => null);
+
+      const userInfo = await authService.signUp('username', 'password');
+
+      expect(userInfo).toBeNull();
+    });
   });
 });
