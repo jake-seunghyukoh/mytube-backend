@@ -7,7 +7,7 @@ import { hash } from 'bcrypt';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async findOne(username: string): Promise<User | undefined> {
+  async findOne(username: string): Promise<User | null> {
     const userWhereUniqueInput: Prisma.UserWhereUniqueInput = {
       username: username,
     };
@@ -17,7 +17,7 @@ export class UsersService {
     });
   }
 
-  async createOne(username: string, password: string): Promise<User> {
+  async createOne(username: string, password: string): Promise<User | null> {
     const user = await this.findOne(username);
     if (!user) {
       const hashedPassword = await hash(password, 10);
