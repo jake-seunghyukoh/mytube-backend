@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
 import { LoginResponseDto } from './dto/login.dto';
 import { SignUpResponseDto } from './dto/signup.dto';
+import { User } from '.prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +17,7 @@ export class AuthService {
     username: string,
     pass: string,
   ): Promise<SignUpResponseDto | null> {
-    const user = await this.usersService.findOne(username);
+    const user: User | null = await this.usersService.findOne(username);
     if (user && (await compare(pass, user.password))) {
       const { password, ...result } = user;
       return result;
@@ -35,7 +36,7 @@ export class AuthService {
     username: string,
     pass: string,
   ): Promise<SignUpResponseDto | null> {
-    const user = await this.usersService.createOne(username, pass);
+    const user: User | null = await this.usersService.createOne(username, pass);
     if (user) {
       const { password, ...result } = user;
       return result;
