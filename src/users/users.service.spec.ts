@@ -26,14 +26,62 @@ describe('UsersService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should create an user', async () => {
-    const user: User = { id: 1, username: 'test', password: 'password' };
-    prismaMock.user.create.mockResolvedValue(user);
+  describe('findOne', () => {
+    it('should return a unique user if the user exist', async () => {
+      const mockedUser: User = {
+        id: 1,
+        username: 'test',
+        password: 'password',
+      };
+      prismaMock.user.findUnique.mockResolvedValue(mockedUser); // Mock find unique user
 
-    const input = { username: 'test', password: 'password' };
+      const user = await service.findOne('username');
 
-    const result = await service.createOne(input.username, input.password);
+      expect(user).toBe(mockedUser);
+    });
 
-    expect(result).toBe(user);
+    it('should return null if the user does not exist', async () => {
+      prismaMock.user.findUnique.mockResolvedValue(null); // Mock find unique user
+
+      const user = await service.findOne('username');
+
+      expect(user).toBeNull();
+    });
+  });
+
+  describe('createOne', () => {
+    it('should return a created user', async () => {
+      const mockedUser: User = {
+        id: 1,
+        username: 'test',
+        password: 'password',
+      };
+
+      jest.spyOn(service, 'findOne').mockImplementation(async () => null); // Mock findOne
+
+      prismaMock.user.create.mockResolvedValue(mockedUser); // Mock create user
+
+      const input = { username: 'test', password: 'password' };
+
+      const user = await service.createOne(input.username, input.password);
+
+      expect(user).toBe(mockedUser);
+    });
+
+    it('should return null if the user already exist', async () => {
+      const mockedUser: User = {
+        id: 1,
+        username: 'test',
+        password: 'password',
+      };
+
+      jest.spyOn(service, 'findOne').mockImplementation(async () => mockedUser); // Mock findOne
+
+      const input = { username: 'test', password: 'password' };
+
+      const user = await service.createOne(input.username, input.password);
+
+      expect(user).toBeNull();
+    });
   });
 });
