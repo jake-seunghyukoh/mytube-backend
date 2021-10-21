@@ -38,3 +38,4 @@ prisma/migrations
 prisma/dev.db-journal
 
 .env
+upload/
