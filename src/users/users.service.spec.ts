@@ -5,6 +5,7 @@ import { UsersController } from './users.controller';
 import { mockReset } from 'jest-mock-extended';
 import { prismaMock } from '../singleton';
 import { User } from '.prisma/client';
+import { ProfilesService } from '../profiles/profiles.service';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -15,6 +16,7 @@ describe('UsersService', () => {
       providers: [
         UsersService,
         { provide: PrismaService, useValue: prismaMock },
+        ProfilesService,
       ],
       controllers: [UsersController],
     }).compile();
